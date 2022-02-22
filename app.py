@@ -1,10 +1,18 @@
 import itertools
 from os import system
 from sqlite3 import Time
+import tkinter
 from unittest import case
+from tkinter import * 
 
 
-
+global threeLettersFlag
+global madeWords
+global gui
+global label
+madeWords= []
+gui = tkinter.Tk()
+label = Label(gui, text = "")
 
 
 #def query_dictionary_API(word):
@@ -19,29 +27,37 @@ from unittest import case
    # except:
     #    print("Dictionary Error: Likely issues - Internet Connection, Bad API Key, Merriam Webster is unresponsive")
     #    return 
-    
-    
-def run():
-    #display()
-    letters = input("what are the letters to solve? (ABCDE)")
 
-    print(letters)
+def display():
+
+    gui.configure(background="light grey")
+    gui.title("Wordscapes Solver")
+    gui.geometry("350x500")
+    inputLetters = StringVar()
+    threeLettersFlag = False
+
+    expression_field = Entry(gui, textvariable=inputLetters)
+    solveButton = Button(gui, text=' Solve ', fg='black', bg='light blue',
+				command=lambda: run(inputLetters.get(),threeLettersFlag), height=1, width=7)
+    threeLettersButtonOff = Button(gui, text=' Three Letters not allowed ', fg='black', bg='red',
+				command=lambda: threeLetters(False), height=1, width=18)
+    threeLettersButtonOn = Button(gui, text=' Three Letters allowed ', fg='black', bg='green',
+				command=lambda: threeLetters(True), height=1, width=15)
+
+    expression_field.pack()
+    threeLettersButtonOff.pack()
+    threeLettersButtonOn.pack()
+    solveButton.pack()
+    
+
+    gui.mainloop()
+
+
+
+def run(letters,threelettersFlag):
     for letter in letters:
         if letter.isnumeric() == True or len(letters) <=3:
             letters.pop(letter)
-        if len(letters)<4:
-            Time.sleep(1000)
-            print("not enough letters")
-            system.exit()
-
-    threeLettersInput= input("Three Letter words allowed? (yes,y,no,n)")
-    if threeLettersInput=="yes" or threeLettersInput =="y":
-        threeLettersAllowed = True
-    elif threeLettersInput=="no" or threeLettersInput=="n":
-        threeLettersAllowed = False
-    else:
-        print("not valid input")
-        run()
 
     AllCombinations = []
     print("letters:  " + letters)
@@ -50,28 +66,36 @@ def run():
         i+=1
         for combination in itertools.combinations(letters, i): #add search here to see if word has no vowels
             AllCombinations.append(convertTuple(combination))
+    print ("all letter combos")
     print (AllCombinations)
     file =  open('words_alpha.txt')
     
-
+    madeWords = []
     for line in file: 
         for word in line.split():
             for str in AllCombinations:
-                if threeLettersAllowed==True:
+                if threelettersFlag==True:
                     if str==word and len(str)>=3:
-                        print (str)
-                if threeLettersAllowed==False:
+                        madeWords.append(str)
+                if threelettersFlag==False:
                     if str==word and len(str)>3:
-                        print(str)
+                        madeWords.append(str)
+    print ("words made:")
+    print (madeWords)
+    label = Label(gui, text = madeWords)
+        
+    label.pack()
+    return madeWords
 
 def convertTuple(tup):
-        # initialize an empty string
+    # initialize an empty string
     str = ''
     for item in tup:
         str = str + item
     return str
 
+def threeLetters(flag):
+    threeLettersFlag = flag
 
-
-if __name__=="__main__":
-    run()
+if __name__ == "__main__":
+    display()    
