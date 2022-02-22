@@ -1,3 +1,6 @@
+import itertools
+from os import system
+from sqlite3 import Time
 from unittest import case
 
 
@@ -20,14 +23,16 @@ from unittest import case
     
 def run():
     #display()
-    lettersAsString = input("what are the letters to solve? (ABCDE)")
-    letters = lettersAsString.split()
+    letters = input("what are the letters to solve? (ABCDE)")
+
     print(letters)
     for letter in letters:
-        if letter.isalpha != True or len(letters) <=3:
-            print("not valid input")
-            run()
-
+        if letter.isnumeric() == True or len(letters) <=3:
+            letters.pop(letter)
+        if len(letters)<4:
+            Time.sleep(1000)
+            print("not enough letters")
+            system.exit()
 
     threeLettersInput= input("Three Letter words allowed? (yes,y,no,n)")
     if threeLettersInput=="yes" or threeLettersInput =="y":
@@ -39,20 +44,34 @@ def run():
         run()
 
     AllCombinations = []
-    for i in letters:
-        for j in letters:
-            if j != i:
-                AllCombinations.append(int(str(i) + str(j)))
+    print("letters:  " + letters)
+    for i in range(len(letters)+1):
+        i+=1
+        i+=1
+        for combination in itertools.combinations(letters, i): #add search here to see if word has no vowels
+            AllCombinations.append(convertTuple(combination))
+    print (AllCombinations)
+    file =  open('words_alpha.txt')
     
-    
-    with open('words_alpha.txt') as file:
-        contents = file.read()
-        for i in AllCombinations:
-            if i in contents:
-                print ('word found')
-            else:
-                print ('word not found')
 
-        
+    for line in file: 
+        for word in line.split():
+            for str in AllCombinations:
+                if threeLettersAllowed==True:
+                    if str==word and len(str)>=3:
+                        print (str)
+                if threeLettersAllowed==False:
+                    if str==word and len(str)>3:
+                        print(str)
+
+def convertTuple(tup):
+        # initialize an empty string
+    str = ''
+    for item in tup:
+        str = str + item
+    return str
+
+
+
 if __name__=="__main__":
     run()
